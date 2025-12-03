@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>细胞间 - 预约系统</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"></script>
+    <title>细胞间 - 云端预约系统</title>
+    <script src="//code.bdstatic.com/npm/leancloud-storage@4.12.0/dist/av-min.js"></script>
     <style>
+        /* 保持原有样式不变，仅增加加载中的样式 */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -14,119 +15,38 @@
             padding: 20px;
         }
         .container { max-width: 800px; margin: 0 auto; }
-        h1 {
-            text-align: center;
-            color: #312e81;
-            margin-bottom: 30px;
-            font-size: 28px;
-        }
-        .card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            padding: 24px;
-            margin-bottom: 20px;
-        }
+        h1 { text-align: center; color: #312e81; margin-bottom: 30px; font-size: 28px; }
+        .card { background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 24px; margin-bottom: 20px; }
         h2 { color: #1f2937; margin-bottom: 20px; font-size: 20px; }
         .form-group { margin-bottom: 20px; }
-        label {
-            display: block;
-            font-weight: 500;
-            color: #374151;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-        .desk-buttons {
-            display: flex;
-            gap: 16px;
-        }
-        .desk-btn {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid #d1d5db;
-            border-radius: 8px;
-            background: white;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 16px;
-        }
+        label { display: block; font-weight: 500; color: #374151; margin-bottom: 8px; font-size: 14px; }
+        .desk-buttons { display: flex; gap: 16px; }
+        .desk-btn { flex: 1; padding: 12px; border: 2px solid #d1d5db; border-radius: 8px; background: white; cursor: pointer; transition: all 0.2s; font-size: 16px; }
         .desk-btn:hover { border-color: #818cf8; }
-        .desk-btn.active {
-            border-color: #4f46e5;
-            background: #eef2ff;
-            color: #4f46e5;
-        }
-        input, select {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-        input:focus, select:focus {
-            outline: none;
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
-        .submit-btn {
-            width: 100%;
-            padding: 12px;
-            background: #4f46e5;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
+        .desk-btn.active { border-color: #4f46e5; background: #eef2ff; color: #4f46e5; }
+        input, select { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; }
+        input:focus, select:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+        .submit-btn { width: 100%; padding: 12px; background: #4f46e5; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
         .submit-btn:hover { background: #4338ca; }
-        .message {
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .submit-btn:disabled { background: #9ca3af; cursor: not-allowed; }
+        .message { padding: 12px; border-radius: 8px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
         .message.success { background: #d1fae5; color: #065f46; }
         .message.error { background: #fee2e2; color: #991b1b; }
-        .booking-item {
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        .booking-item { border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
         .booking-item:hover { background: #f9fafb; }
         .booking-info .desk { font-weight: 600; color: #4f46e5; font-size: 18px; }
-        .booking-info .details {
-            color: #6b7280;
-            font-size: 14px;
-            margin-top: 4px;
-        }
-        .cancel-btn {
-            padding: 8px 16px;
-            background: #ef4444;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-        }
+        .booking-info .details { color: #6b7280; font-size: 14px; margin-top: 4px; }
+        .cancel-btn { padding: 8px 16px; background: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
         .cancel-btn:hover { background: #dc2626; }
-        .empty-state {
-            text-align: center;
-            color: #9ca3af;
-            padding: 40px 0;
-        }
+        .empty-state { text-align: center; color: #9ca3af; padding: 40px 0; }
+        
+        /* 加载动画 */
+        .loading { text-align: center; color: #6b7280; padding: 20px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>细胞间 - 预约系统</h1>
+        <h1>细胞间 - 预约系统 (云端同步版)</h1>
         
         <div class="card">
             <h2>新建预约</h2>
@@ -142,7 +62,7 @@
 
             <div class="form-group">
                 <label>预约日期</label>
-                <input type="date" id="date" min="">
+                <input type="date" id="date">
             </div>
 
             <div class="form-group">
@@ -173,19 +93,40 @@
                 <input type="text" id="userName" placeholder="请输入您的姓名">
             </div>
 
-            <button class="submit-btn" onclick="submitBooking()">提交预约</button>
+            <button class="submit-btn" id="submitBtn" onclick="submitBooking()">提交预约</button>
         </div>
 
         <div class="card">
-            <h2>当前预约</h2>
-            <div id="bookingList"></div>
+            <h2>当前预约 (实时同步)</h2>
+            <div id="bookingList">
+                <div class="loading">正在加载数据...</div>
+            </div>
         </div>
     </div>
 
     <script>
-        let selectedDesk = '';
-        let bookings = JSON.parse(localStorage.getItem('roomBookings') || '[]');
+        // ================= 配置区域 =================
+        // 请去 LeanCloud (leancloud.cn) 注册账号，创建应用
+        // 在 设置 > 应用凭证 中找到 AppID 和 AppKey 填入下方
+        const APP_ID = 'qmXzXEoaery3zmwWfGYraJkm-MdYXbMMI'; 
+        const APP_KEY = 'DQw07FENKXA4KRNHsTPIozDy'; 
+        
+        // 建议：如果你只是实验室内部小范围用，不想配置域名，可以考虑使用 LeanCloud 国际版 或者其他类似服务(如 Firebase)
+        // 下面的初始化代码假设你使用的是 LeanCloud 国际版或者已配置好域名的国内版
+        
+        if (APP_ID === 'qmXzXEoaery3zmwWfGYraJkm-MdYXbMMI') {
+            alert("请在代码中填写 LeanCloud 的 App ID 和 App Key 才能实现云同步！");
+        }
 
+        AV.init({
+            appId: APP_ID,
+            appKey: APP_KEY
+        });
+
+        // ==========================================
+
+        let selectedDesk = '';
+        
         // 设置最小日期为今天
         document.getElementById('date').min = new Date().toISOString().split('T')[0];
 
@@ -202,81 +143,120 @@
             setTimeout(() => msgDiv.innerHTML = '', 3000);
         }
 
-        function submitBooking() {
+        async function submitBooking() {
             const date = document.getElementById('date').value;
             const time = document.getElementById('time').value;
             const userName = document.getElementById('userName').value;
+            const btn = document.getElementById('submitBtn');
 
             if (!selectedDesk || !date || !time || !userName) {
                 showMessage('请填写所有信息', 'error');
                 return;
             }
 
-            const isBooked = bookings.some(
-                b => b.desk === selectedDesk && b.date === date && b.time === time
-            );
+            btn.disabled = true;
+            btn.textContent = '提交中...';
 
-            if (isBooked) {
-                showMessage('该时段已被预约，请选择其他时段', 'error');
-                return;
+            try {
+                // 1. 检查是否已被预约 (云端查询)
+                const query = new AV.Query('Booking');
+                query.equalTo('desk', selectedDesk);
+                query.equalTo('date', date);
+                query.equalTo('time', time);
+                const count = await query.count();
+
+                if (count > 0) {
+                    showMessage('该时段已被他人预约，请刷新查看', 'error');
+                    await fetchBookings(); // 刷新列表
+                    return;
+                }
+
+                // 2. 保存到云端
+                const Booking = AV.Object.extend('Booking');
+                const booking = new Booking();
+                booking.set('desk', selectedDesk);
+                booking.set('date', date);
+                booking.set('time', time);
+                booking.set('userName', userName);
+                
+                await booking.save();
+                
+                showMessage('预约成功！', 'success');
+                
+                // 重置表单
+                selectedDesk = '';
+                document.querySelectorAll('.desk-btn').forEach(b => b.classList.remove('active'));
+                document.getElementById('date').value = '';
+                document.getElementById('time').value = '';
+                document.getElementById('userName').value = '';
+                
+                // 刷新列表
+                await fetchBookings();
+
+            } catch (error) {
+                console.error(error);
+                showMessage('预约失败：' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '提交预约';
             }
-
-            const newBooking = {
-                id: Date.now(),
-                desk: selectedDesk,
-                date: date,
-                time: time,
-                userName: userName
-            };
-
-            bookings.push(newBooking);
-            localStorage.setItem('roomBookings', JSON.stringify(bookings));
-            
-            showMessage('预约成功！', 'success');
-            
-            // 清空表单
-            selectedDesk = '';
-            document.querySelectorAll('.desk-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('date').value = '';
-            document.getElementById('time').value = '';
-            document.getElementById('userName').value = '';
-            
-            renderBookings();
         }
 
-        function cancelBooking(id) {
-            bookings = bookings.filter(b => b.id !== id);
-            localStorage.setItem('roomBookings', JSON.stringify(bookings));
-            showMessage('已取消预约', 'success');
-            renderBookings();
+        async function cancelBooking(objectId) {
+            if (!confirm('确定要取消这个预约吗？')) return;
+
+            try {
+                const todo = AV.Object.createWithoutData('Booking', objectId);
+                await todo.destroy();
+                showMessage('已取消预约', 'success');
+                await fetchBookings();
+            } catch (error) {
+                showMessage('取消失败：' + error.message, 'error');
+            }
         }
 
-        function renderBookings() {
+        async function fetchBookings() {
             const listDiv = document.getElementById('bookingList');
             
-            if (bookings.length === 0) {
-                listDiv.innerHTML = '<div class="empty-state">暂无预约记录</div>';
-                return;
-            }
+            try {
+                const query = new AV.Query('Booking');
+                // 按日期排序
+                query.ascending('date');
+                query.addAscending('time');
+                // 只显示今天的和未来的预约
+                // query.greaterThanOrEqualTo('date', new Date().toISOString().split('T')[0]); 
+                
+                const results = await query.find();
+                
+                if (results.length === 0) {
+                    listDiv.innerHTML = '<div class="empty-state">暂无预约记录</div>';
+                    return;
+                }
 
-            bookings.sort((a, b) => new Date(a.date) - new Date(b.date));
-            
-            listDiv.innerHTML = bookings.map(booking => `
-                <div class="booking-item">
-                    <div class="booking-info">
-                        <div class="desk">${booking.desk}</div>
-                        <div class="details">
-                            📅 ${booking.date} ⏰ ${booking.time}<br>
-                            👤 预约人: ${booking.userName}
+                listDiv.innerHTML = results.map(booking => {
+                    const data = booking.attributes;
+                    const id = booking.id;
+                    return `
+                        <div class="booking-item">
+                            <div class="booking-info">
+                                <div class="desk">${data.desk}</div>
+                                <div class="details">
+                                    📅 ${data.date} ⏰ ${data.time}<br>
+                                    👤 预约人: ${data.userName}
+                                </div>
+                            </div>
+                            <button class="cancel-btn" onclick="cancelBooking('${id}')">取消</button>
                         </div>
-                    </div>
-                    <button class="cancel-btn" onclick="cancelBooking(${booking.id})">取消</button>
-                </div>
-            `).join('');
+                    `;
+                }).join('');
+            } catch (error) {
+                listDiv.innerHTML = `<div class="empty-state" style="color:red">数据加载失败，请检查网络或AppKey配置</div>`;
+                console.error(error);
+            }
         }
 
-        // 初始化
-        renderBookings();
+        // 页面加载时拉取数据
+        fetchBookings();
     </script>
 </body>
 </html>
